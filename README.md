@@ -1,4 +1,4 @@
-# Inspiration
+# Laser Tag: *The Future of IPhone App Games*
 ## Jason has been interested in game development, so we decided to go back and forth pitching game ideas to each other until we found one ## that seemed right.
 
 ## What it does

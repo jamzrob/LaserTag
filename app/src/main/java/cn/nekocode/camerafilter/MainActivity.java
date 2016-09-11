@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -45,6 +46,117 @@ public class MainActivity extends AppCompatActivity {
     private TextureView textureView;
     private View crosshairs;
     private int filterId = R.id.filter0;
+    private static final int MAXIMUM_CHARGES=5;
+    private static final int MAXIMUM_HEALTH=3;
+    private int health=3;
+    private int charges=5;
+    private Handler handler;
+
+    public boolean canFire(int chargesRemaining)
+    {
+        if(chargesRemaining>0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //Needs detecting color method
+    public boolean fireLaser(int chargesRemaining)
+    {
+        if(canFire(chargesRemaining))
+        {
+            setCharges(getCharges()-1);
+            if(getCharges()==4)
+            {
+                startRecharge();
+                displayHit();
+            }
+        }
+        return false;
+    }
+
+    public void getHit()
+    {
+        health--;
+        if(getHealth()==2)
+        {
+            startRegenerateHealth();
+        }
+        else if(getHealth()==0)
+        {
+            signalDeath();
+        }
+    }
+
+    public void setCharges(int newCharges)
+    {
+        charges=newCharges;
+    }
+
+    public void setHealth(int newHealth)
+    {
+        health=newHealth;
+    }
+
+    public int getCharges()
+    {
+        return charges;
+    }
+
+    //Needs text mechanics
+    public void displayHit()
+    {
+
+    }
+
+    public int getHealth()
+    {
+        return health;
+    }
+
+    public void startRecharge()
+    {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setCharges(getCharges()+1);
+                if(getCharges()!=MAXIMUM_CHARGES) {
+                    handler.postDelayed(this, 5000);
+                }
+            }
+        }, 2000);
+    }
+
+    public void startRegenerateHealth()
+    {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setHealth(getHealth()+1);
+                if(getHealth()!=MAXIMUM_HEALTH) {
+                    handler.postDelayed(this, 5000);
+                }
+            }
+        }, 5000);
+    }
+
+    //Add text feature and disable tapping screen
+    public void signalDeath()
+    {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                resetLife();
+            }
+        }, 10000);
+    }
+
+    public void resetLife()
+    {
+        setHealth(MAXIMUM_HEALTH);
+        setCharges(MAXIMUM_CHARGES);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +207,15 @@ public class MainActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        renderer.setSelectedFilter(R.id.filter0);
+
+
+                        screenTapped();
+
                         break;
 
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        renderer.setSelectedFilter(filterId);
+
                         break;
                 }
                 return true;
@@ -177,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         pix[0] = 0xff000000 | (R << 16) | (G << 8) | B;
 
 
-Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
+        Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
         OutputStream outputStream = null;
 
 
@@ -193,6 +308,67 @@ Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
         return externalPath + "/" + prefix + timeString + suffix;
     }
 
+    public void screenTapped() {
+        // create bitmap screen capture
+        Bitmap bitmap = textureView.getBitmap();
+        int picw = bitmap.getWidth();
+        int pich = bitmap.getHeight();
+
+        int y= pich/2;
+        int x=picw/2;
+
+        int[] pix = new int[1];
+        bitmap.getPixels(pix, 0, picw, x, y, 1, 1);
+
+        int R;
+        int G;
+        int B;
+
+        R = (pix[0] >> 16) & 0xff;     //bitwise shifting
+        G = (pix[0] >> 8) & 0xff;
+        B = pix[0] & 0xff;
+
+
+
+        //R,G.B - Red, Green, Blue
+        //to restore the values after RGB modification, use
+        //next statement
+        pix[0] = 0xff000000 | (R << 16) | (G << 8) | B;
+
+
+        Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
+
+        boolean hit;
+        int[]rgb=new int[3];
+        rgb[0]=40;
+        rgb[1]=40;
+        rgb[2]=40;
+
+
+        hit=checkColor(R, G, B, rgb, 10);
+
+        Log.d("TAG", "Detected Object: "+hit);
+
+    }
+
+    public boolean checkColor(int r, int g, int b, int[] rgb, int error)
+    {
+        int red=rgb[0];
+        int green=rgb[1];
+        int blue=rgb[2];
+
+        boolean hit=false;
+        if(((red-error)<=r&&r<=(red+error))&&
+                ((blue-error)<=b&&b<=(blue+error))&&
+                ((green-error)<=r&&r<=(green+error)))
+        {
+            hit=true;
+        }
+        return hit;
+
+    }
+
+
+
 
 }
-

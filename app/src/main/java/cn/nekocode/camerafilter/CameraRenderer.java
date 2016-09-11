@@ -28,6 +28,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.view.TextureView;
+import android.view.View;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -134,15 +135,6 @@ public class CameraRenderer extends Thread implements TextureView.SurfaceTexture
     }
 
 
-    public static Bitmap convertYuvByteArrayToBitmap(byte[] data, Camera camera) {
-        Camera.Parameters parameters = camera.getParameters();
-        Camera.Size size = parameters.getPreviewSize();
-        YuvImage image = new YuvImage(data, parameters.getPreviewFormat(), size.width, size.height, null);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, out);
-        byte[] imageBytes = out.toByteArray();
-        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-    }
 
 
     @Override
@@ -287,4 +279,6 @@ public class CameraRenderer extends Thread implements TextureView.SurfaceTexture
         }
         return null;
     }
+
+
 }

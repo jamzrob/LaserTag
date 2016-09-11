@@ -16,7 +16,11 @@
 package cn.nekocode.camerafilter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
@@ -25,6 +29,7 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.TextureView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -128,6 +133,18 @@ public class CameraRenderer extends Thread implements TextureView.SurfaceTexture
         selectedFilter.onAttach();
     }
 
+
+    public static Bitmap convertYuvByteArrayToBitmap(byte[] data, Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        Camera.Size size = parameters.getPreviewSize();
+        YuvImage image = new YuvImage(data, parameters.getPreviewFormat(), size.width, size.height, null);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, out);
+        byte[] imageBytes = out.toByteArray();
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+    }
+
+
     @Override
     public void run() {
         initGL(surfaceTexture);
@@ -164,6 +181,13 @@ public class CameraRenderer extends Thread implements TextureView.SurfaceTexture
         try {
             camera.setPreviewTexture(cameraSurfaceTexture);
             camera.startPreview();
+            camera.setPreviewCallback(new Camera.PreviewCallback() {
+                @Override
+                public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+                }
+            });
+            camera.setPreviewCallback(null);
         } catch (IOException ioe) {
             // Something bad happened
         }

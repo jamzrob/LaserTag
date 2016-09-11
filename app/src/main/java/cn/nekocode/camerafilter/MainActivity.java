@@ -23,6 +23,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -122,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         filterId = item.getItemId();
@@ -144,29 +149,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean caputre() {
-        String mPath = genSaveFileName(getTitle().toString() + "_", ".png");
-        File imageFile = new File(mPath);
-        if (imageFile.exists()) {
-            imageFile.delete();
-        }
 
         // create bitmap screen capture
         Bitmap bitmap = textureView.getBitmap();
+        int picw = bitmap.getWidth();
+        int pich = bitmap.getHeight();
+
+        int y= pich/2;
+        int x=picw/2;
+
+        int[] pix = new int[1];
+        bitmap.getPixels(pix, 0, picw, x, y, 1, 1);
+
+        int R;
+        int G;
+        int B;
+
+        R = (pix[0] >> 16) & 0xff;     //bitwise shifting
+        G = (pix[0] >> 8) & 0xff;
+        B = pix[0] & 0xff;
+
+
+
+        //R,G.B - Red, Green, Blue
+        //to restore the values after RGB modification, use
+        //next statement
+        pix[0] = 0xff000000 | (R << 16) | (G << 8) | B;
+
+
+Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
         OutputStream outputStream = null;
 
-        try {
-            outputStream = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream);
-            outputStream.flush();
-            outputStream.close();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
 
         return true;
     }

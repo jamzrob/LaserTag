@@ -28,6 +28,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ButtonBarLayout;
 import android.telephony.SmsManager;
 import android.text.Editable;
 import android.util.Log;
@@ -36,6 +37,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,16 +71,22 @@ public class MainActivity extends AppCompatActivity {
     private View healthbar1;
     private View healthbar0;
     private TextView countdown;
+    private Button colorbutton;
     private int filterId = R.id.filter0;
     private static final int MAXIMUM_CHARGES = 5;
     private static final int MAXIMUM_HEALTH = 3;
     private int health = 3;
     private int charges = 3;
     private Handler handler;
+
+    private int[] rgb = new int[3];
+
     private View.OnTouchListener laserListener;
     private int deathCount=10;
     private final static int MY_PERMISSIONS_REQUEST_SEND_SMS=500;
     private EditText phonetext;
+
+    private boolean setupColor=false;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -227,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         healthbar1= findViewById(R.id.healthbar1);
         healthbar0= findViewById(R.id.healthbar0);
         phonetext= (EditText) findViewById(R.id.phonetext);
-
+        colorbutton = (Button) findViewById(R.id.colorbutton);
         handler= new Handler();
 
         if (ContextCompat.checkSelfPermission(this,
@@ -407,9 +415,53 @@ public class MainActivity extends AppCompatActivity {
         return externalPath + "/" + prefix + timeString + suffix;
     }
 
+   void clicker(View view)
+   {
+       //fireLaser(charges);
+       // create bitmap screen capture
+       Bitmap bitmap = textureView.getBitmap();
+       int picw = bitmap.getWidth();
+       int pich = bitmap.getHeight();
+
+       int y = pich / 2;
+       int x = picw / 2;
+
+       int[] pix = new int[1];
+       bitmap.getPixels(pix, 0, picw, x, y, 1, 1);
+
+       int R;
+       int G;
+       int B;
+
+       R = (pix[0] >> 16) & 0xff;     //bitwise shifting
+       G = (pix[0] >> 8) & 0xff;
+       B = pix[0] & 0xff;
+
+
+       //R,G.B - Red, Green, Blue
+       //to restore the values after RGB modification, use
+       //next statement
+       pix[0] = 0xff000000 | (R << 16) | (G << 8) | B;
+
+
+       Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
+
+       boolean hit;
+
+       rgb[0] = R;
+       rgb[1] = G;
+       rgb[2] = B;
+
+       setupColor=true;
+
+
+   }
+
+
+
     public void screenTapped() {
 
-        //fireLaser(charges);
+        fireLaser(charges);
         // create bitmap screen capture
         Bitmap bitmap = textureView.getBitmap();
         int picw = bitmap.getWidth();
@@ -439,13 +491,13 @@ public class MainActivity extends AppCompatActivity {
         Log.d("TAG", "pix r " + R + " g " + G + " b " + B);
 
         boolean hit;
-        int[] rgb = new int[3];
-        rgb[0] = 40;
-        rgb[1] = 40;
-        rgb[2] = 40;
+        if(setupColor==false) {
+            rgb[0] = 40;
+            rgb[1] = 40;
+            rgb[2] = 40;
+        }
 
-
-        hit = checkColor(R, G, B, rgb, 20);
+        hit = checkColor(R, G, B, rgb, 30);
 
 
 
@@ -477,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Start of game
-    public int[] configureOpponent() {
+    /*public int[] configureOpponent() {
 
         //Take a picture and assign the rgb values to that picture
         // create bitmap screen capture
@@ -517,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
 
         return rgb;
 
-    }
+    }*/
 
     //Display Instructions
     public void displayInstructions() {

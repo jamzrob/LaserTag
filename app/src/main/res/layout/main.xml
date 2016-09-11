@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:paddingBottom="45dp"
         android:src="@drawable/healthbar3"
         />
     <ImageView
@@ -45,6 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:paddingBottom="45dp"
         android:src="@drawable/healthbar2"
         android:visibility="gone"
         />
@@ -54,6 +56,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:paddingBottom="45dp"
         android:src="@drawable/healthbar1"
         android:visibility="gone"
         />
@@ -63,6 +66,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:paddingBottom="45dp"
         android:src="@drawable/healthbar0"
         android:visibility="gone"
         />
@@ -72,6 +76,16 @@
         android:layout_height="wrap_content"
         android:hint="Enter Opponent Phone Number"
         android:id="@+id/phonetext"/>
+
+    <!--New Stuff-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:hint="Configure Opponent Color"
+        android:id="@+id/colorbutton"
+        android:onClick="clicker"/>
 
 
 </RelativeLayout>

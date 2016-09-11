@@ -1,5 +1,5 @@
-# Laser Tag: *The Future of IPhone App Games*
-Run around and try and tag your friends with a laser. Take advantage of next generation color detection models and an intiutively simple gameplay field. 
+# Laser Tag: *The Future of Android Games*
+Run around and try to tag your friends with a laser. Take advantage of next generation color detection models and an intiutively simple gameplay field. 
 
 ## How it Works
 The game takes the color of the enemy shirt for both players, then creates a value of the shot by tapping the screen. The eliminated player will be notified via text message (both players must enter each other's phone numbers prior to starting) when they have been shot. The person who has been shot the least by the end of the game wins. 
